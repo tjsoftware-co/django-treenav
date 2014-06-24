@@ -97,33 +97,37 @@ class MenuItem(MPTTModel):
     label = models.CharField(
         _('label'),
         max_length=255,
-        help_text="The display name on the web site.",
+        help_text=_("The display name on the web site."),
     )
     slug = models.SlugField(
         _('slug'),
         unique=True,
         max_length=255,
-        help_text="Unique identifier for this menu item (also CSS ID)"
+        help_text=_("Unique identifier for this menu item (also CSS ID)")
     )
     order = models.IntegerField(
         _('order'),
         choices=[(x, x) for x in xrange(0, 51)],
     )
-    is_enabled = models.BooleanField(default=True)
+    is_enabled = models.BooleanField(
+        _('Is enabled'),
+        default=True)
     link = models.CharField(
         _('link'),
         max_length=255,
-        help_text="The view of the page you want to link to, as a python path or the shortened URL name.",
+        help_text=_("The view of the page you want to link to, as a python path or the shortened URL name."),
         blank=True,
     )
     content_type = models.ForeignKey(
         ContentType,
         null=True,
         blank=True,
+        verbose_name=_('Content type'),
     )
     object_id = models.PositiveIntegerField(
         null=True,
         blank=True,
+        verbose_name=_('Object id'),
     )
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     href = models.CharField(_('href'), editable=False, max_length=255)
