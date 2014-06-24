@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
@@ -15,7 +16,20 @@ from mptt.models import MPTTModel, TreeForeignKey
 from mptt.utils import previous_current_next
 
 
+EXACT_MATCH = getattr(settings, 'TREENAV_EXACT_MATCH', True)
+if EXACT_MATCH:
+    def check_active(node, href):
+        return (node.link.startswith('^') and
+            re.match(node.link, href.lstrip('/'))) or node.href == href
+else:
+    def check_active(node, href):
+        return (node.link.startswith('^') and
+            re.match(node.link, href.lstrip('/'))) or \
+                (node.href and href.startswith(node.href)) 
+
+
 class Item(object):
+        
     def __init__(self, node):
         self.parent = None
         self.node = node
@@ -38,11 +52,10 @@ class Item(object):
             children = [c for c in self.children if c.node.is_enabled]
             self._enabled_children = children
         return children
-    
+
     def set_active(self, href):
         active_node = None
-        if (self.node.href.startswith('^') and
-            re.match(self.node.href, href)) or self.node.href == href:
+        if check_active(self.node, href):
             self.active = True
             parent = self.parent
             while parent:
