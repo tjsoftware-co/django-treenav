@@ -54,11 +54,11 @@ class MenuItemAdmin(MPTTModelAdmin):
         }),
         ('URL', {
             'fields': ('link', ('content_type', 'object_id')),
-            'description': "The URL for this menu item, which can be a "
-                           "fully qualified URL, an absolute URL, a named "
-                           "URL, a path to a Django view, a regular "
-                           "expression, or a generic relation to a model that "
-                           "supports get_absolute_url()"
+            'description': _("""The URL for this menu item, which can be a 
+                            fully qualified URL, an absolute URL, a named 
+                            URL, a path to a Django view, a regular 
+                            expression, or a generic relation to a model that 
+                            supports get_absolute_url()""")
         }),
     )
     list_editable = ('label',)

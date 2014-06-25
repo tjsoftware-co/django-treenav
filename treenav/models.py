@@ -106,7 +106,12 @@ class MenuItemManager(models.Manager):
     
 class MenuItem(MPTTModel):
 
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+    parent = TreeForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        related_name='children',
+        verbose_name=_('Parent'),)
     label = models.CharField(
         _('label'),
         max_length=255,
@@ -150,6 +155,8 @@ class MenuItem(MPTTModel):
     
     class Meta:
         ordering = ('lft', 'tree_id')
+        verbose_name = _('MenuItem')
+        verbose_name_plural = _('MenuItems')
 
     class MPTTMeta:
         order_insertion_by = ('order', )
