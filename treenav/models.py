@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
@@ -15,7 +16,20 @@ from mptt.models import MPTTModel, TreeForeignKey
 from mptt.utils import previous_current_next
 
 
+EXACT_MATCH = getattr(settings, 'TREENAV_EXACT_MATCH', True)
+if EXACT_MATCH:
+    def check_active(node, href):
+        return (node.link.startswith('^') and
+            re.match(node.link, href.lstrip('/'))) or node.href == href
+else:
+    def check_active(node, href):
+        return (node.link.startswith('^') and
+            re.match(node.link, href.lstrip('/'))) or \
+                (node.href and href.startswith(node.href)) 
+
+
 class Item(object):
+        
     def __init__(self, node):
         self.parent = None
         self.node = node
@@ -38,11 +52,10 @@ class Item(object):
             children = [c for c in self.children if c.node.is_enabled]
             self._enabled_children = children
         return children
-    
+
     def set_active(self, href):
         active_node = None
-        if (self.node.href.startswith('^') and
-            re.match(self.node.href, href)) or self.node.href == href:
+        if check_active(self.node, href):
             self.active = True
             parent = self.parent
             while parent:
@@ -93,37 +106,46 @@ class MenuItemManager(models.Manager):
     
 class MenuItem(MPTTModel):
 
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+    parent = TreeForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        related_name='children',
+        verbose_name=_('Parent'),)
     label = models.CharField(
         _('label'),
         max_length=255,
-        help_text="The display name on the web site.",
+        help_text=_("The display name on the web site."),
     )
     slug = models.SlugField(
         _('slug'),
         unique=True,
         max_length=255,
-        help_text="Unique identifier for this menu item (also CSS ID)"
+        help_text=_("Unique identifier for this menu item (also CSS ID)")
     )
     order = models.IntegerField(
         _('order'),
         choices=[(x, x) for x in xrange(0, 51)],
     )
-    is_enabled = models.BooleanField(default=True)
+    is_enabled = models.BooleanField(
+        _('Is enabled'),
+        default=True)
     link = models.CharField(
         _('link'),
         max_length=255,
-        help_text="The view of the page you want to link to, as a python path or the shortened URL name.",
+        help_text=_("The view of the page you want to link to, as a python path or the shortened URL name."),
         blank=True,
     )
     content_type = models.ForeignKey(
         ContentType,
         null=True,
         blank=True,
+        verbose_name=_('Content type'),
     )
     object_id = models.PositiveIntegerField(
         null=True,
         blank=True,
+        verbose_name=_('Object id'),
     )
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     href = models.CharField(_('href'), editable=False, max_length=255)
@@ -133,6 +155,8 @@ class MenuItem(MPTTModel):
     
     class Meta:
         ordering = ('lft', 'tree_id')
+        verbose_name = _('MenuItem')
+        verbose_name_plural = _('MenuItems')
 
     class MPTTMeta:
         order_insertion_by = ('order', )
