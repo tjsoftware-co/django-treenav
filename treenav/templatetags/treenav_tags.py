@@ -36,8 +36,13 @@ class SingleLevelMenuNode(CaktNode):
     """
     Renders the nth-level items of a named Menu model object.
     """
+<<<<<<< Updated upstream
     
     def render_with_args(self, context, slug, level):
+=======
+
+    def render_with_args(self, context, slug, level, template_name='treenav/menuitem.html'):
+>>>>>>> Stashed changes
         level = int(level)
         menu = get_menu_item(slug)
         if not menu:
@@ -60,7 +65,7 @@ class SingleLevelMenuNode(CaktNode):
             return ''
         context['full_tree'] = False
         context['single_level'] = True
-        return render_to_string('treenav/menuitem.html', context)
+        return render_to_string(template_name, context)
 
 
 # Usage example:
@@ -75,8 +80,13 @@ class MenuNode(CaktNode):
     """
     Renders the top-level items of a named Menu model object.
     """
+<<<<<<< Updated upstream
     
     def render_with_args(self, context, slug, full_tree=False):
+=======
+
+    def render_with_args(self, context, slug, full_tree=False, template_name='treenav/menuitem.html'):
+>>>>>>> Stashed changes
         # don't modify the parent context
         parent_context = context
         context = new_context(parent_context)
@@ -92,7 +102,7 @@ class MenuNode(CaktNode):
             context['active_menu_items'] = active_leaf.get_active_items()
         context['menuitem'] = root
         context['full_tree'] = ('True' == full_tree)
-        return render_to_string('treenav/menuitem.html', context)
+        return render_to_string(template_name, context)
 
     
 @register.tag(name='show_treenav')
@@ -108,23 +118,23 @@ class RenderMenuChildrenNode(template.Node):
     def __init__(self, item):
         self.item = template.Variable(item)
 
-    def render(self, context):
+    def render(self, context, template_name='treenav/menuitem.html'):
         parent_context = context
         item = self.item.resolve(parent_context)
         context = new_context(parent_context)
         context['menuitem'] = item
         context['full_tree'] = parent_context['full_tree']
-        return render_to_string('treenav/menuitem.html', context)
+        return render_to_string(template_name, context)
 
 
 @register.tag(name='render_menu_children')
 def do_render_menu_children(parser, token):
-    menu_path = token.split_contents()
-    return RenderMenuChildrenNode(menu_path[1])
+    tag_name, args, kwargs = parse_args_kwargs(parser, token)
+    return RenderMenuChildrenNode(*args, **kwargs)
 
 
 class ActiveMenuItemsNode(CaktNode):
-    def render_with_args(self, context, slug):
+    def render_with_args(self, context, slug, template_name='treenav/menucrumbs.html'):
         parent_context = context
         context = new_context(parent_context)
         menu = get_menu_item(slug)
@@ -137,7 +147,7 @@ class ActiveMenuItemsNode(CaktNode):
             active_leaf = None
         if active_leaf:
             context['active_menu_items'] = active_leaf.get_active_items()
-        return render_to_string('treenav/menucrumbs.html', context)
+        return render_to_string(template_name, context)
 
 
 @register.tag()
