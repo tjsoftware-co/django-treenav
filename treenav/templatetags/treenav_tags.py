@@ -36,13 +36,8 @@ class SingleLevelMenuNode(CaktNode):
     """
     Renders the nth-level items of a named Menu model object.
     """
-<<<<<<< Updated upstream
-    
-    def render_with_args(self, context, slug, level):
-=======
 
     def render_with_args(self, context, slug, level, template_name='treenav/menuitem.html'):
->>>>>>> Stashed changes
         level = int(level)
         menu = get_menu_item(slug)
         if not menu:
@@ -80,13 +75,8 @@ class MenuNode(CaktNode):
     """
     Renders the top-level items of a named Menu model object.
     """
-<<<<<<< Updated upstream
-    
-    def render_with_args(self, context, slug, full_tree=False):
-=======
 
     def render_with_args(self, context, slug, full_tree=False, template_name='treenav/menuitem.html'):
->>>>>>> Stashed changes
         # don't modify the parent context
         parent_context = context
         context = new_context(parent_context)
@@ -104,23 +94,21 @@ class MenuNode(CaktNode):
         context['full_tree'] = ('True' == full_tree)
         return render_to_string(template_name, context)
 
-    
+
 @register.tag(name='show_treenav')
 def show_treenav(parser, token):
     tag_name, args, kwargs = parse_args_kwargs(parser, token)
     return MenuNode(*args, **kwargs)
 
 
-class RenderMenuChildrenNode(template.Node):
+class RenderMenuChildrenNode(CaktNode):
     """
     Renders the children of the given MenuItem model object.
     """
-    def __init__(self, item):
-        self.item = template.Variable(item)
 
-    def render(self, context, template_name='treenav/menuitem.html'):
+    def render_with_args(self, context, slug, template_name='treenav/menuitem.html'):
         parent_context = context
-        item = self.item.resolve(parent_context)
+        item = slug
         context = new_context(parent_context)
         context['menuitem'] = item
         context['full_tree'] = parent_context['full_tree']
@@ -154,4 +142,4 @@ class ActiveMenuItemsNode(CaktNode):
 def show_menu_crumbs(parser, token):
     tag_name, args, kwargs = parse_args_kwargs(parser, token)
     return ActiveMenuItemsNode(*args, **kwargs)
-   
+
