@@ -160,7 +160,13 @@ class MenuItem(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ('order', )
-    
+
+    def get_url(self):
+        return self.href
+
+    def get_absolute_url(self):
+        return self.href
+
     def to_tree(self):
         cache_key = 'menu-tree-%s' % self.slug
         root = cache.get(cache_key)
