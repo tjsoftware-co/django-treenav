@@ -17,15 +17,19 @@ from mptt.utils import previous_current_next
 
 
 EXACT_MATCH = getattr(settings, 'TREENAV_EXACT_MATCH', True)
-if EXACT_MATCH:
-    def check_active(node, href):
-        return (node.link.startswith('^') and
-            re.match(node.link, href.lstrip('/'))) or node.href == href
+CHECK_ACTIVE = getattr(settings, 'TREENAV_CHECK_ACTIVE', None)
+if CHECK_ACTIVE:
+    check_active = CHECK_ACTIVE
 else:
-    def check_active(node, href):
-        return (node.link.startswith('^') and
-            re.match(node.link, href.lstrip('/'))) or \
-                (node.href and href.startswith(node.href)) 
+    if EXACT_MATCH:
+        def check_active(node, href):
+            return (node.link.startswith('^') and
+                re.match(node.link, href.lstrip('/'))) or node.href == href
+    else:
+        def check_active(node, href):
+            return (node.link.startswith('^') and
+                re.match(node.link, href.lstrip('/'))) or \
+                    (node.href and href.startswith(node.href))
 
 
 class Item(object):
