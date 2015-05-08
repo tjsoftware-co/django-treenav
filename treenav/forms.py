@@ -57,12 +57,14 @@ class MenuItemForm(MenuItemFormMixin, MPTTAdminForm):
 
     class Meta:
         model = MenuItem
+        exclude = ()
 
 
 class MenuItemInlineForm(MenuItemFormMixin, forms.ModelForm):
 
     class Meta:
         model = MenuItem
+        exclude = ()
 
 
 class GenericInlineMenuItemForm(forms.ModelForm):

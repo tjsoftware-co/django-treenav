@@ -79,7 +79,7 @@ class MenuNode(CaktNode):
     def render_with_args(self, context, slug, full_tree=False, template_name='treenav/menuitem.html'):
         # don't modify the parent context
         parent_context = context
-        context = new_context(parent_context)
+        # context = new_context(parent_context)
         menu = get_menu_item(slug)
         if not menu:
             return ''
