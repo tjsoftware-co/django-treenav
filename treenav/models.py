@@ -129,7 +129,7 @@ class MenuItem(MPTTModel):
     )
     order = models.IntegerField(
         _('order'),
-        choices=[(x, x) for x in xrange(0, 51)],
+        choices=[(x, x) for x in range(0, 51)],
     )
     is_enabled = models.BooleanField(
         _('Is enabled'),
